@@ -3,20 +3,16 @@ import { headerTemplate } from '../src/header';
 import { listTamplate } from '../src/list';
 import '../styles/style.css';
 
-const header = headerTemplate(); // инициализируем компоненты
-const usersList = listTamplate();
-const data = getData(); // получаем данные
+const data = getData();
 
-let currentPosition = 22; // стартовое кол-во юзеров в списке
+render(headerTemplate(), listTamplate());
 
-document.addEventListener('DOMContentLoaded', () => {
-    render(header, usersList); // рендерим DOM
+document
+    .querySelector('.list-wrap__container')
+    .addEventListener('scroll', event => usersListLoading(event));
+const listContainer = document.querySelector('.list-wrap__content');
 
-    firstLoad(); // отображаем начальный список
-
-    const listContainer = document.querySelector('.list-wrap__container');
-    listContainer.addEventListener('scroll', () => usersLoading(listContainer));
-});
+firstLoad();
 
 function render(...components) {
     components.forEach(comp =>
@@ -24,33 +20,31 @@ function render(...components) {
     );
 }
 
-function usersLoading(container) {
-    const fullContentHeight = container.scrollHeight;
-    const scrollHeight = container.scrollTop + container.clientHeight;
+function usersListLoading(event) {
+    const scrollPoss = event.target.scrollTop;
 
-    if (fullContentHeight < scrollHeight + 150) {  // при приближении к концу списка делаем подгрузку данных
-        const newItem = data.slice(currentPosition, currentPosition + 1);
-        currentPosition++;
-        renderUserItem(newItem);
-    }
+    const startToRender = Math.floor(scrollPoss / 30);
+
+    listContainer.innerHTML = '';
+    renderUserItem(data.slice(startToRender, startToRender + 20));
+    listContainer.style.paddingTop = scrollPoss + 'px';
+    listContainer.style.height = 300000 - scrollPoss + 'px';
 }
 
 function firstLoad() {
-    renderUserItem(data.slice(0, currentPosition));
+    renderUserItem(data.slice(0, 20));
 }
 
 function renderUserItem(list) {
     list.forEach(user => {
         const userItem = getUserItemTemplate(user);
-        document
-            .querySelector('.list-wrap__container')
-            .insertAdjacentHTML('beforeend', userItem);
+        listContainer.insertAdjacentHTML('beforeend', userItem);
     });
 }
 
 function getUserItemTemplate({ index, name, fathername, surname }) {
     return `
-        <div class="user-item">
+        <div id=${index + 1} class="user-item">
             <span>${index + 1}</span>
             <div>${name}</div>
             <div>${fathername}</div>

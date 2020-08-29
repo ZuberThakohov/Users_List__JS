@@ -7,7 +7,9 @@ export function listTamplate() {
                 <strong>Fathername</strong>
                 <strong>Surname</strong>
             </div>
-            <div class="list-wrap__container"></div>
+            <div class="list-wrap__container">
+                <div class="list-wrap__content"></div>
+            </div>
         </div>
     `;
 }
